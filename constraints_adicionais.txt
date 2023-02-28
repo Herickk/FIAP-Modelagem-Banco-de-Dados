@@ -1,0 +1,136 @@
+
+linha 3 - Ferramentas para exclusao de tabelas
+
+DROP TABLE T_SIP_CLIENTE CASCADE CONSTRAINTS
+DROP TABLE T_SIP_CADASTRO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_TELEFONE CASCADE CONSTRAINTS
+DROP TABLE T_SIP_FUNCIONARIO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_ENDERECO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_FISICA CASCADE CONSTRAINTS
+DROP TABLE T_SIP_JURIDICA CASCADE CONSTRAINTS
+DROP TABLE T_SIP_TIPO_TEL CASCADE CONSTRAINTS
+DROP TABLE T_SIP_NAO_LOGIN CASCADE CONSTRAINTS
+DROP TABLE T_SIP_LOGIN CASCADE CONSTRAINTS
+DROP TABLE T_SIP_SAC CASCADE CONSTRAINTS
+DROP TABLE T_SIP_PRODUTO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_VIDEO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_VISUALIZACAO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_CAT_PRODUTO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_STATUS_CAT CASCADE CONSTRAINTS
+DROP TABLE T_SIP_CAT_VIDEO CASCADE CONSTRAINTS
+
+linha 42 - Criacao de Sequencia para codigo de categoria de produto conforme RN05
+
+	CREATE SEQUENCE sq_cod_categoria
+	INCREMENT BY 1
+	START WITH 101
+	MAXVALUE 999
+	NOCACHE
+	NOCYCLE;
+
+
+linha 96 - Constraint CHECK para definir sexo na tabela PESSOA FISICA
+
+
+	ALTER TABLE t_sip_fisica
+		ADD CONSTRAINT ck_sip_ds_sexo CHECK ( ds_sexo IN (
+			'FEMININO',
+			'MASCULINO'
+		) );
+
+
+
+linha 156 - Constraint CHECK para definir status do produto conforme regra do negocio
+
+
+	ALTER TABLE t_sip_produto
+		ADD CONSTRAINT ck_status_produto CHECK (st_produto IN (
+			'A',
+			'I',
+			'P'
+		) );
+
+
+
+linha 163 - Criacao de Sequencia para codigo de produto conforme RN02
+
+
+	CREATE SEQUENCE sq_codigo_produto
+	INCREMENT BY 1
+	START WITH 1001
+	MAXVALUE 9999
+	NOCACHE
+	NOCYCLE;
+
+
+
+linha 187 - Constraint CHECK para definir classificacao da chamada conforme RN18
+
+
+	ALTER TABLE t_sip_sac 
+		ADD CONSTRAINT ck_ds_tipo CHECK (ds_tipo IN (
+			'Sugestao',
+			'Reclamacao'
+		) );
+
+
+
+linha 193 - Criacao de Sequencia para numero de atentimento SAC conforme RN12
+
+	CREATE SEQUENCE sq_numero_sac
+	INCREMENT BY 1
+	START WITH 10000001
+	MAXVALUE 99999999
+	NOCACHE
+	NOCYCLE;
+
+linha 201 - Constraint CHECK para definir status da chamada conforme RN15
+
+	ALTER TABLE t_sip_sac
+		ADD CONSTRAINT ck_status_chamada CHECK (st_chamada IN (
+			'A',
+			'E',
+			'C',
+			'F',
+			'X'
+		) );
+
+linha 211 - Constraint CHECK para definir satisfacao do cliente conforme RN17
+
+	ALTER TABLE t_sip_sac
+		ADD CONSTRAINT ck_satisfacao_cliente CHECK (id_satisfacao IN (
+			'1',
+			'2',
+			'3',
+			'4',
+			'5',
+			'6',
+			'7',
+			'8',
+			'9',
+			'10'
+		) );
+
+
+linha 233 - Constraint CHECK para definir status da categoria conforme regra de negocio
+
+	ALTER TABLE t_sip_cat_produto
+		ADD CONSTRAINT ck_ds_status CHECK ( ds_status IN (
+			'A',
+			'I'
+	) );
+
+
+linha 270 - Constraint CHECK para definir status do video conforme regra de negocio
+
+	ALTER TABLE t_sip_video
+		ADD CONSTRAINT ck_status_video CHECK (st_video IN (
+			'A',
+			'I'
+		) );
+	
+
+
+
+
+

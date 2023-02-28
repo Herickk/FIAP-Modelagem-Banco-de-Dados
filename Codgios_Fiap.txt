@@ -1,0 +1,367 @@
+/* EXCLUSAO DE TABELAS E CONSTRAINTS
+
+DROP TABLE T_SIP_CLIENTE CASCADE CONSTRAINTS
+DROP TABLE T_SIP_CADASTRO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_TELEFONE CASCADE CONSTRAINTS
+DROP TABLE T_SIP_FUNCIONARIO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_ENDERECO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_FISICA CASCADE CONSTRAINTS
+DROP TABLE T_SIP_JURIDICA CASCADE CONSTRAINTS
+DROP TABLE T_SIP_TIPO_TEL CASCADE CONSTRAINTS
+DROP TABLE T_SIP_NAO_LOGIN CASCADE CONSTRAINTS
+DROP TABLE T_SIP_LOGIN CASCADE CONSTRAINTS
+DROP TABLE T_SIP_SAC CASCADE CONSTRAINTS
+DROP TABLE T_SIP_PRODUTO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_VIDEO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_VISUALIZACAO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_CAT_PRODUTO CASCADE CONSTRAINTS
+DROP TABLE T_SIP_STATUS_CAT CASCADE CONSTRAINTS
+DROP TABLE T_SIP_CAT_VIDEO CASCADE CONSTRAINTS
+
+*/
+
+CREATE TABLE t_sip_cadastro (
+    cd_cliente  VARCHAR2(8 CHAR) NOT NULL,
+    nm_completo VARCHAR2(50) NOT NULL,
+    ds_email    VARCHAR2(30 CHAR)
+);
+
+ALTER TABLE t_sip_cadastro ADD CONSTRAINT t_sip_cadastro_pk PRIMARY KEY ( cd_cliente );
+
+
+CREATE TABLE t_sip_cat_produto (
+    cd_categoria NUMBER(3) NOT NULL,
+    ds_categoria VARCHAR2(30) NOT NULL,
+    dt_inicio    DATE NOT NULL,
+    dt_termino   DATE,
+    ds_status    VARCHAR2(1 CHAR) NOT NULL
+);
+
+ALTER TABLE t_sip_cat_produto ADD CONSTRAINT t_sip_cat_produto_pk PRIMARY KEY ( cd_categoria );
+
+CREATE SEQUENCE sq_cod_categoria
+INCREMENT BY 1
+START WITH 101
+MAXVALUE 999
+NOCACHE
+NOCYCLE;
+
+
+
+
+CREATE TABLE t_sip_cat_video (
+    cd_cat_video NUMBER(8) NOT NULL,
+    nm_categoria VARCHAR2(15 CHAR) NOT NULL,
+    ds_categoria VARCHAR2(30 CHAR) NOT NULL
+);
+
+ALTER TABLE t_sip_cat_video ADD CONSTRAINT t_sip_cat_video_pk PRIMARY KEY ( cd_cat_video );
+
+
+CREATE TABLE t_sip_cliente (
+    cd_cliente  VARCHAR2(8 CHAR) NOT NULL,
+    ds_password NVARCHAR2(8) NOT NULL,
+    dt_adesao   DATE NOT NULL,
+    qt_ordens   NUMBER(6) NOT NULL
+);
+
+ALTER TABLE t_sip_cliente ADD CONSTRAINT t_sip_cliente_pk PRIMARY KEY ( cd_cliente );
+
+
+CREATE TABLE t_sip_endereco (
+    cd_cliente      VARCHAR2(8 CHAR) NOT NULL,
+    tipo            VARCHAR2(10 CHAR) NOT NULL,
+    rua             VARCHAR2(30 CHAR) NOT NULL,
+    numero          NVARCHAR2(5) NOT NULL,
+    complemento     NVARCHAR2(5),
+    cep             NUMBER(8) NOT NULL,
+    cidade          VARCHAR2(20 CHAR) NOT NULL,
+    unidade_federal VARCHAR2(2 CHAR) NOT NULL
+);
+
+ALTER TABLE t_sip_endereco ADD CONSTRAINT t_sip_endereco_pk PRIMARY KEY ( cd_cliente );
+
+
+CREATE TABLE t_sip_fisica (
+    cd_cliente VARCHAR2(8 CHAR) NOT NULL,
+    nm_rg      NUMBER(12) NOT NULL,
+    nm_cpf     NUMBER(14) NOT NULL,
+    dt_nasc    DATE NOT NULL,
+    ds_sexo    VARCHAR2(1 CHAR) NOT NULL
+);
+
+ALTER TABLE t_sip_fisica ADD CONSTRAINT t_sip_fis_pk PRIMARY KEY ( cd_cliente );
+
+
+ALTER TABLE t_sip_fisica
+	ADD CONSTRAINT ck_sip_ds_sexo CHECK ( ds_sexo IN (
+		'FEMININO'
+		'MASCULINO'
+	) );
+
+
+CREATE TABLE t_sip_funcionario (
+    cd_funcionario   NUMBER(8) NOT NULL,
+    nm_funcionario   VARCHAR2(30 CHAR),
+    dt_nascimento    DATE NOT NULL,
+    nr_telefone      NUMBER(12) NOT NULL,
+    ds_cargo         VARCHAR2(12 CHAR) NOT NULL,
+    nm_departamento  VARCHAR2(12) NOT NULL,
+    cd_tipo_telefone NUMBER(8) NOT NULL
+);
+
+ALTER TABLE t_sip_funcionario ADD CONSTRAINT t_sip_funcionario_pk PRIMARY KEY ( cd_funcionario );
+
+
+CREATE TABLE t_sip_juridica (
+    cd_cliente  VARCHAR2(8 CHAR) NOT NULL,
+    nr_cnpj     NUMBER(16) NOT NULL,
+    nr_insc_est NUMBER(10),
+    ds_ramo_atv VARCHAR2(20) NOT NULL
+);
+
+ALTER TABLE t_sip_juridica ADD CONSTRAINT t_sip_jur_pk PRIMARY KEY ( cd_cliente );
+
+
+CREATE TABLE t_sip_login (
+    id_login   NUMBER(8) NOT NULL,
+    cd_cliente VARCHAR2(8 CHAR) NOT NULL,
+    dt_login   DATE NOT NULL
+);
+
+ALTER TABLE t_sip_login ADD CONSTRAINT t_sip_login_pk PRIMARY KEY ( id_login );
+
+
+CREATE TABLE t_sip_naologin (
+    cd_cliente      VARCHAR2(8 CHAR) NOT NULL,
+    cd_produto      NUMBER(10) NOT NULL,
+    dt_visualizacao DATE
+);
+
+ALTER TABLE t_sip_naologin ADD CONSTRAINT t_sip_nl_pk PRIMARY KEY ( cd_cliente,
+                                                                    cd_produto );
+
+CREATE TABLE t_sip_produto (
+    cd_produto   NUMBER(4) NOT NULL,
+    st_produto   VARCHAR2(1 CHAR) NOT NULL,
+    nm_produto   VARCHAR2(10 CHAR) NOT NULL,
+    dc_produto   VARCHAR2(50 CHAR) NOT NULL,
+    cd_barras    NUMBER(13),
+    pr_unitario  NUMBER(5, 2) NOT NULL,
+    cd_categoria NUMBER(8) NOT NULL
+);
+
+ALTER TABLE t_sip_produto ADD CONSTRAINT t_sip_produto_pk PRIMARY KEY ( cd_produto );
+
+ALTER TABLE t_sip_produto
+	ADD CONSTRAINT ck_status_produto CHECK (st_produto IN (
+		'A'
+		'I'
+		'P'
+	) );
+
+CREATE SEQUENCE sq_codigo_produto
+INCREMENT BY 1
+START WITH 1001
+MAXVALUE 9999
+NOCACHE
+NOCYCLE;
+
+CREATE TABLE t_sip_sac (
+    nr_sac                    NUMBER(8) NOT NULL,
+    dt_abertura               DATE NOT NULL,
+    dt_atendimento            DATE,
+    ds_ocorrencia_cliente     VARCHAR2(10000 CHAR) NOT NULL,
+    ds_tipo                   NUMBER(1) NOT NULL,
+    ds_ocorrencia_funcionario VARCHAR2(20000 CHAR),
+    st_chamada                VARCHAR2(1 CHAR) NOT NULL,
+    tp_atendimento            NUMBER(2) NOT NULL,
+    id_satisfacao             NUMBER(1),
+    id_login                  NUMBER(8) NOT NULL,
+    cd_funcionario            NUMBER(8) NOT NULL,
+    cd_produto                NUMBER(10) NOT NULL
+);
+
+ALTER TABLE t_sip_sac ADD CONSTRAINT t_sip_sac_pk PRIMARY KEY ( nr_sac );
+
+ALTER TABLE t_sip_sac 
+	ADD CONSTRAINT ck_ds_tipo CHECK (ds_tipo IN (
+		'Sugestao'
+		'Reclamacao'
+	) );
+
+CREATE SEQUENCE sq_numero_sac
+INCREMENT BY 1
+START WITH 10000001
+MAXVALUE 99999999
+NOCACHE
+NOCYCLE;
+
+
+ALTER TABLE t_sip_sac
+	ADD CONSTRAINT ck_status_chamada CHECK (st_chamada IN (
+		'A'
+		'E'
+		'C'
+		'F'
+		'X'
+	) );
+
+
+ALTER TABLE t_sip_sac
+	ADD CONSTRAINT ck_satisfacao_cliente CHECK (id_satisfacao IN (
+		'1'
+		'2'
+		'3'
+		'4'
+		'5'
+		'6'
+		'7'
+		'8'
+		'9'
+		'10'
+	) );
+
+
+CREATE TABLE t_sip_status_cat (
+    ds_status VARCHAR2(1 CHAR) NOT NULL
+);
+
+ALTER TABLE t_sip_status_cat ADD CONSTRAINT t_sip_status_cat_pk PRIMARY KEY ( ds_status );
+
+
+ALTER TABLE t_sip_status_cat
+	ADD CONSTRAINT ck_ds_status CHECK ( ds_status IN (
+		'A'
+		'I'
+) );
+
+
+CREATE TABLE t_sip_telefone (
+    cd_telefone      VARCHAR2(8 CHAR) NOT NULL,
+    nr_residencial   NUMBER(6),
+    nr_comercial     NUMBER(6),
+    nr_movel         NUMBER(6),
+    cd_tipo_telefone NUMBER(8) NOT NULL,
+    cd_cliente       VARCHAR2(8 CHAR) NOT NULL
+);
+
+ALTER TABLE t_sip_telefone ADD CONSTRAINT t_sip_telefone_pk PRIMARY KEY ( cd_telefone );
+
+
+CREATE TABLE t_sip_tipo_tel (
+    cd_tipo_telefone NUMBER(8) NOT NULL,
+    nr_ddd           NUMBER(3) NOT NULL
+);
+
+ALTER TABLE t_sip_tipo_tel ADD CONSTRAINT t_sip_tipo_tel_pk PRIMARY KEY ( cd_tipo_telefone );
+
+
+CREATE TABLE t_sip_video (
+    cd_video     NUMBER(10) NOT NULL,
+    st_video     VARCHAR2(1 CHAR) NOT NULL,
+    cd_produto   NUMBER(10) NOT NULL,
+    cd_cat_video NUMBER(8) NOT NULL
+);
+
+
+ALTER TABLE t_sip_video ADD CONSTRAINT t_sip_video_pk PRIMARY KEY ( cd_video );
+
+ALTER TABLE t_sip_video
+		ADD CONSTRAINT ck_status_video CHECK (st_video IN (
+			'A'
+			'I'
+		) );
+
+
+CREATE TABLE t_sip_visualizacao (
+    id_visualizacao NUMBER(10) NOT NULL,
+    id_login        NUMBER(8),
+    cd_video        NUMBER(10) NOT NULL,
+    dt_visualizacao DATE NOT NULL
+);
+
+ALTER TABLE t_sip_visualizacao ADD CONSTRAINT t_sip_vis_pk PRIMARY KEY ( id_visualizacao );
+
+
+ALTER TABLE t_sip_fisica
+    ADD CONSTRAINT t_sip_cadastro_fis_fk FOREIGN KEY ( cd_cliente )
+        REFERENCES t_sip_cadastro ( cd_cliente );
+
+ALTER TABLE t_sip_endereco
+    ADD CONSTRAINT t_sip_cadastro_fk FOREIGN KEY ( cd_cliente )
+        REFERENCES t_sip_cadastro ( cd_cliente );
+
+ALTER TABLE t_sip_juridica
+    ADD CONSTRAINT t_sip_cadastro_jur_fk FOREIGN KEY ( cd_cliente )
+        REFERENCES t_sip_cadastro ( cd_cliente );
+
+ALTER TABLE t_sip_produto
+    ADD CONSTRAINT t_sip_cat_produto_fk FOREIGN KEY ( cd_categoria )
+        REFERENCES t_sip_cat_produto ( cd_categoria );
+
+ALTER TABLE t_sip_video
+    ADD CONSTRAINT t_sip_cat_video_fk FOREIGN KEY ( cd_cat_video )
+        REFERENCES t_sip_cat_video ( cd_cat_video );
+
+ALTER TABLE t_sip_cadastro
+    ADD CONSTRAINT t_sip_cliente_fk FOREIGN KEY ( cd_cliente )
+        REFERENCES t_sip_cliente ( cd_cliente );
+
+ALTER TABLE t_sip_naologin
+    ADD CONSTRAINT t_sip_cliente_ng_fk FOREIGN KEY ( cd_cliente )
+        REFERENCES t_sip_cliente ( cd_cliente );
+
+ALTER TABLE t_sip_login
+    ADD CONSTRAINT t_sip_lg_cliente_fk FOREIGN KEY ( cd_cliente )
+        REFERENCES t_sip_cliente ( cd_cliente );
+
+ALTER TABLE t_sip_cat_produto
+    ADD CONSTRAINT t_sip_prod_st_cat_fk FOREIGN KEY ( ds_status )
+        REFERENCES t_sip_status_cat ( ds_status );
+
+ALTER TABLE t_sip_naologin
+    ADD CONSTRAINT t_sip_produto_ng_fk FOREIGN KEY ( cd_produto )
+        REFERENCES t_sip_produto ( cd_produto );
+
+ALTER TABLE t_sip_sac
+    ADD CONSTRAINT t_sip_sac_func_fk FOREIGN KEY ( cd_funcionario )
+        REFERENCES t_sip_funcionario ( cd_funcionario );
+
+ALTER TABLE t_sip_sac
+    ADD CONSTRAINT t_sip_sac_login_fk FOREIGN KEY ( id_login )
+        REFERENCES t_sip_login ( id_login );
+
+ALTER TABLE t_sip_sac
+    ADD CONSTRAINT t_sip_sac_prod_fk FOREIGN KEY ( cd_produto )
+        REFERENCES t_sip_produto ( cd_produto );
+
+ALTER TABLE t_sip_telefone
+    ADD CONSTRAINT t_sip_tel_cad_fk FOREIGN KEY ( cd_cliente )
+        REFERENCES t_sip_cadastro ( cd_cliente );
+
+ALTER TABLE t_sip_telefone
+    ADD CONSTRAINT t_sip_tel_tipo_fk FOREIGN KEY ( cd_tipo_telefone )
+        REFERENCES t_sip_tipo_tel ( cd_tipo_telefone );
+
+ALTER TABLE t_sip_funcionario
+    ADD CONSTRAINT t_sip_tipo_fk FOREIGN KEY ( cd_tipo_telefone )
+        REFERENCES t_sip_tipo_tel ( cd_tipo_telefone );
+
+ALTER TABLE t_sip_video
+    ADD CONSTRAINT t_sip_video_prod_fk FOREIGN KEY ( cd_produto )
+        REFERENCES t_sip_produto ( cd_produto );
+
+ALTER TABLE t_sip_visualizacao
+    ADD CONSTRAINT t_sip_vis_lg_fk FOREIGN KEY ( id_login )
+        REFERENCES t_sip_login ( id_login );
+
+ALTER TABLE t_sip_visualizacao
+    ADD CONSTRAINT t_sip_vis_vid_fk FOREIGN KEY ( cd_video )
+        REFERENCES t_sip_video ( cd_video );
+
+
+
+
+
+
